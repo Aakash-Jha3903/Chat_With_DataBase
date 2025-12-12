@@ -5,8 +5,9 @@ import { QueryInput } from './components/features/QueryInput';
 import { SQLDisplay } from './components/features/SQLDisplay';
 import { ResultsTable } from './components/features/ResultsTable';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
+import { ConfirmationDialog } from './components/ui/ConfirmationDialog';
 import { api } from './api/client';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 import './App.css';
 
 function App() {
@@ -17,6 +18,9 @@ function App() {
   const [sqlQuery, setSqlQuery] = useState(null);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [pendingQuery, setPendingQuery] = useState(null);
 
   // Dark mode effect
   useEffect(() => {
@@ -57,14 +61,23 @@ function App() {
     }
   };
 
-  const handleQuerySubmit = async (prompt) => {
+  // Check if SQL query is destructive (UPDATE, DELETE, INSERT, etc.)
+  const isDestructiveQuery = (sqlQuery) => {
+    if (!sqlQuery || !sqlQuery.sql_query) return false;
+    const query = sqlQuery.sql_query.trim().toUpperCase();
+    const destructiveKeywords = ['UPDATE', 'DELETE', 'INSERT', 'DROP', 'ALTER', 'TRUNCATE', 'CREATE'];
+    return destructiveKeywords.some(keyword => query.startsWith(keyword));
+  };
+
+  const executeQuery = async (prompt) => {
     setQueryLoading(true);
     setError(null);
+    setSuccessMessage(null);
     setSqlQuery(null);
     setResults(null);
 
     try {
-      const response = await api.getDataFrame(prompt);
+      const sqlResponse = await api.getSQLQuery(prompt);
 
       if (response.query) {
         setSqlQuery(response.query);
@@ -73,13 +86,100 @@ function App() {
       if (response.data && response.data.length > 0) {
         setResults(response.data);
       } else if (response.message) {
-        setError(response.message);
+        // Check if it's a success message or error
+        if (response.message.toLowerCase().includes('success')) {
+          setSuccessMessage(response.message);
+        } else if (response.message.toLowerCase().includes('error')) {
+          setError(response.message);
+        } else {
+          setSuccessMessage(response.message);
+        }
       }
     } catch (err) {
       setError('Failed to execute query: ' + err.message);
     } finally {
       setQueryLoading(false);
     }
+  };
+
+  const handleQuerySubmit = async (prompt) => {
+    // First, generate the SQL query without executing it
+    setQueryLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      // Step 1: Generate SQL query only (doesn't execute)
+      const sqlResponse = await api.getSQLQuery(prompt);
+
+      if (sqlResponse && isDestructiveQuery(sqlResponse)) {
+        // Show confirmation dialog WITHOUT executing
+        setPendingQuery({ prompt, sqlQuery: sqlResponse });
+        setShowConfirmation(true);
+        setQueryLoading(false);
+      } else {
+        // For SELECT queries, execute immediately
+        const response = await api.getDataFrame(prompt);
+
+        if (response.query) {
+          setSqlQuery(response.query);
+        }
+
+        if (response.data && response.data.length > 0) {
+          setResults(response.data);
+        } else if (response.message) {
+          if (response.message.toLowerCase().includes('success')) {
+            setSuccessMessage(response.message);
+          } else if (response.message.toLowerCase().includes('error')) {
+            setError(response.message);
+          } else {
+            setSuccessMessage(response.message);
+          }
+        }
+        setQueryLoading(false);
+      }
+    } catch (err) {
+      setError('Failed to execute query: ' + err.message);
+      setQueryLoading(false);
+    }
+  };
+
+  const handleConfirmQuery = async () => {
+    if (pendingQuery) {
+      setQueryLoading(true);
+      setShowConfirmation(false);
+
+      try {
+        // Execute query ONLY after confirmation
+        const response = await api.getDataFrame(pendingQuery.prompt);
+
+        if (response.query) {
+          setSqlQuery(response.query);
+        }
+
+        if (response.data && response.data.length > 0) {
+          setResults(response.data);
+        } else if (response.message) {
+          if (response.message.toLowerCase().includes('success')) {
+            setSuccessMessage(response.message);
+          } else if (response.message.toLowerCase().includes('error')) {
+            setError(response.message);
+          } else {
+            setSuccessMessage(response.message);
+          }
+        }
+      } catch (err) {
+        setError('Failed to execute query: ' + err.message);
+      } finally {
+        setQueryLoading(false);
+        setPendingQuery(null);
+      }
+    }
+  };
+
+  const handleCancelQuery = () => {
+    setShowConfirmation(false);
+    setPendingQuery(null);
   };
 
   const dbInitialized = initiateStatus === 'success' && schemaStatus === 'success';
@@ -129,6 +229,33 @@ function App() {
             </div>
           )}
 
+          {/* Success Message Display */}
+          {successMessage && (
+            <div className="glass rounded-lg p-4 border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/20 animate-slide-up">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-emerald-800 dark:text-emerald-300 mb-1">
+                    Success
+                  </h4>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-400">
+                    {successMessage}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Confirmation Dialog */}
+          <ConfirmationDialog
+            isOpen={showConfirmation}
+            onClose={handleCancelQuery}
+            onConfirm={handleConfirmQuery}
+            title="Confirm Database Modification"
+            message="This query will modify your database. Please review the SQL query below and confirm to proceed."
+            sqlQuery={pendingQuery?.sqlQuery?.sql_query}
+          />
+
           {/* Query Input */}
           <QueryInput
             onSubmit={handleQuerySubmit}
@@ -168,3 +295,4 @@ function App() {
 }
 
 export default App;
+

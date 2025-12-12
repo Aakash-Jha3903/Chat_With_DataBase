@@ -1,0 +1,110 @@
+﻿import { useState, useEffect } from 'react';
+import { Header } from './components/layout/Header';
+import { InitializationPanel } from './components/features/InitializationPanel';
+import { QueryInput } from './components/features/QueryInput';
+import { SQLDisplay } from './components/features/SQLDisplay';
+import { ResultsTable } from './components/features/ResultsTable';
+import { LoadingSpinner } from './components/ui/LoadingSpinner';
+import { ConfirmationDialog } from './components/ui/ConfirmationDialog';
+import { api } from './api/client';
+import { AlertCircle, CheckCircle } from 'lucide-react';
+import './App.css';
+
+function App() {
+  const [darkMode, setDarkMode] = useState(false);
+  const [initiateStatus, setInitiateStatus] = useState('idle');
+  const [schemaStatus, setSchemaStatus] = useState('idle');
+  const [queryLoading, setQueryLoading] = useState(false);
+  const [sqlQuery, setSqlQuery] = useState(null);
+  const [results, setResults] = useState(null);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [pendingQuery, setPendingQuery] = useState(null);
+
+  // Dark mode effect
+  useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode === 'true') {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    document.documentElement.classList.toggle('dark');
+    localStorage.setItem('darkMode', (!darkMode).toString());
+  };
+
+  const handleInitiate = async () => {
+    setInitiateStatus('loading');
+    setError(null);
+    try {
+      await api.initiateSQLAgent();
+      setInitiateStatus('success');
+    } catch (err) {
+      setInitiateStatus('error');
+      setError('Failed to initiate AI agent: ' + err.message);
+    }
+  };
+
+  const handleLoadSchema = async () => {
+    setSchemaStatus('loading');
+    setError(null);
+    try {
+      await api.loadDBTablesSchema();
+      setSchemaStatus('success');
+    } catch (err) {
+      setSchemaStatus('error');
+      setError('Failed to load schema: ' + err.message);
+    }
+  };
+
+  // Check if SQL query is destructive (UPDATE, DELETE, INSERT, etc.)
+  const isDestructiveQuery = (sqlQuery) => {
+    if (!sqlQuery || !sqlQuery.sql_query) return false;
+    const query = sqlQuery.sql_query.trim().toUpperCase();
+    const destructiveKeywords = ['UPDATE', 'DELETE', 'INSERT', 'DROP', 'ALTER', 'TRUNCATE', 'CREATE'];
+    return destructiveKeywords.some(keyword => query.startsWith(keyword));
+  };
+
+  const executeQuery = async (prompt) => {
+    setQueryLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+    setSqlQuery(null);
+    setResults(null);
+
+    try {
+      const response = await api.getDataFrame(prompt);
+
+      if (response.query) {
+        setSqlQuery(response.query);
+      }
+
+      if (response.data && response.data.length > 0) {
+        setResults(response.data);
+      } else if (response.message) {
+        // Check if it's a success message or error
+        if (response.message.toLowerCase().includes('success')) {
+          setSuccessMessage(response.message);
+        } else if (response.message.toLowerCase().includes('error')) {
+          setError(response.message);
+        } else {
+          setSuccessMessage(response.message);
+        }
+      }
+    } catch (err) {
+      setError('Failed to execute query: ' + err.message);
+    } finally {
+      setQueryLoading(false);
+    }
+  };
+
+  const handleQuerySubmit = async (prompt) => {
+    // First, get the SQL query to check if it's destructive
+    setQueryLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+

@@ -2,10 +2,11 @@ export const API_BASE_URL = 'http://localhost:8000';
 
 export const EXAMPLE_QUERIES = [
   "Show me all users",
-  "Get the top 10 products by sales",
-  "Find customers who made purchases in the last 30 days",
-  "Calculate total revenue by category",
-  "List all orders with customer details",
+  "Show all table names",
+  "Number of tables",
+  "Database name",
+  "Show me all records from users table",
+  "Count total records in each table",
 ];
 
 export const STATUS = {

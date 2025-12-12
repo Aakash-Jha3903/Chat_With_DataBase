@@ -24,4 +24,5 @@ dist/
 # Node module
 node_modules
 Browser_GPT_app/
+frontend/
 
