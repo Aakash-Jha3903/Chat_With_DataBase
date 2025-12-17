@@ -2,6 +2,7 @@
 
 <div align="center">
 
+![Python](https://img.shields.io/badge/Python-000000?style=for-the-badge&logo=python&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
@@ -47,6 +48,27 @@
 - ⚡ **Real-time** - Instant query generation and execution
 
 ---
+
+## 📸 Interface Gallery
+
+1. **Natural Language Input**
+   ![Natural Language Input](Interface_Images/prompt_1.png)
+
+2. **Destructive Query Confirmation**
+   ![Confirmation Dialog](Interface_Images/prompt_2(update_confimation).png)
+
+3. **Query Results**
+   ![Query Results](Interface_Images/prompt_3(No_of_Records_in_each_tables).png)
+
+4. **Export Options**
+   ![Export Options](Interface_Images/Export_CSV_Json.png)
+
+5. **Dark Mode UI**
+   ![Dark Mode UI 1](Interface_Images/Dark_Mode_UI_1.png)
+   ![Dark Mode UI 2](Interface_Images/Dark_Mode_UI_2.png)
+
+---
+
 
 ## ✨ Features
 
@@ -485,7 +507,6 @@ postgresql_ai_agent/
 ├── requirement.txt          # Python dependencies
 └── README.md               # This file
 ```
-
 ---
 
 ## 🤝 Contributing
@@ -518,6 +539,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Aakash Jha**
 
+- 🌐 [Portfolio](http://aakash-jha--portfolio.vercel.app/)
+- 💼 [LinkedIn](https://www.linkedin.com/in/aakash-jha-a11931257/)
 - GitHub: [@Aakash-Jha3903](https://github.com/Aakash-Jha3903)
 - Project: [Chat with Database](https://github.com/Aakash-Jha3903/Chat_With_DataBase)
 
