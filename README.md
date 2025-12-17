@@ -2,8 +2,8 @@
 
 <div align="center">
 
-![Python](https://img.shields.io/badge/Python-000000?style=for-the-badge&logo=python&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Python](https://img.shields.io/badge/Python-000000?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)
@@ -46,6 +46,17 @@
 - 🎯 **Smart Suggestions** - Quick query templates and recent query history
 - 🌓 **Dark Mode** - Eye-friendly interface for day and night coding
 - ⚡ **Real-time** - Instant query generation and execution
+
+---
+
+
+## 🚀 Why It’s Useful for Both Tech and Non-Tech Users
+
+**For developers**🧑‍💻, this tool streamlines the process of querying databases, converting complex natural language requests into precise SQL commands. It saves time and reduces errors by eliminating the need to manually write SQL queries, allowing developers to focus on higher-level tasks.
+
+**For non-technical users**😎, it opens up the power of data without requiring any knowledge of SQL. By simply typing a natural language question, anyone in the company can access the information they need from the database, empowering them to make data-driven decisions with ease and confidence.
+
+Whether you’re building complex reports or just curious about data, this tool makes interacting with databases effortless, bringing the power of advanced analytics to everyone, regardless of technical expertise.
 
 ---
 
