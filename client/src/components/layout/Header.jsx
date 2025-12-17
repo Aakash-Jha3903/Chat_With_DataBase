@@ -12,7 +12,7 @@ export const Header = ({ darkMode, toggleDarkMode, dbInitialized }) => {
                             <Database className="h-6 w-6 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold gradient-text">PostgreSQL AI Agent</h1>
+                            <h1 className="text-2xl font-bold gradient-text">Chat With Database<span className="text-primary-500">🤖</span></h1>
                             <p className="text-xs text-slate-600 dark:text-slate-400">Natural Language to SQL</p>
                         </div>
                     </div>
